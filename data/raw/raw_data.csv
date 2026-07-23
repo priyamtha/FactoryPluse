@@ -1,7 +1,0 @@
-customer_id,name,email,amount,quantity,category,region,last_updated,status_date
-1,Alice,alice@example.com,100.0,1.0,A,North,2023-01-01,2023-01-01
-2,Bob,,250.0,2.0,B,South,2023-01-02,
-3,Alice,alice@example.com,100.0,,A,North,,2023-01-03
-4,,charlie@example.com,500.0,5.0,C,,2023-01-04,2023-01-04
-5,Diana,,200.0,3.0,B,East,2023-01-05,
-6,Evan,evan@example.com,,4.0,A,West,2023-01-06,2023-01-06
