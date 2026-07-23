@@ -1,81 +1,62 @@
-1
-# GitHub Workflow
+\# Python Workflow
 
 
 
-\## Branching Strategy
+\## How to Execute
 
 
 
-\- main contains production-ready code only.
-
-\- Feature branches follow feature/\[description].
-
-\- Branches are deleted after merge.
+Run:
 
 
 
-\## Commit Convention
+```bash
+
+python scripts/data\_workflow.py
+
+```
 
 
 
-Format:
+\## Functions
 
 
 
-\[type]: description
+\### ingest\_data(filepath)
 
 
 
-Types:
-
-\- feat
-
-\- fix
-
-\- docs
-
-\- refactor
-
-\- chore
+Reads data from a CSV file and returns a Pandas DataFrame.
 
 
 
-This keeps commit history clean and enables changelog generation.
+\### process\_data(df)
 
 
 
-\## Pull Request Process
+Removes duplicate rows and fills missing numeric values.
 
 
 
-\- Every PR requires at least one approval.
-
-\- Reviews focus on correctness, clarity, data integrity, and test coverage.
-
-\- Commit messages are reviewed.
+\### output\_results(df, output\_path)
 
 
 
-\## Issue Tracking
+Saves the processed data to a CSV file and prints a success message.
 
 
 
-\- Every feature or bug starts with a GitHub issue.
-
-\- Every issue has a title, description, label and assignee.
-
-\- Issues are closed after the PR is merged.
-
-## Code Reviews
+\## Using Another Dataset
 
 
 
-Every pull request must be reviewed before merging.
-
-## Branch Cleanup
+Replace:
 
 
 
-Delete feature branches after merging.
+data/raw/sample.csv
+
+
+
+with the path to your own CSV file.
 
