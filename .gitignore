@@ -1,0 +1,9 @@
+# Ignore local data
+data/
+
+# Ignore python cache
+__pycache__/
+*.pyc
+
+# Ignore Jupyter checkpoints
+.ipynb_checkpoints/

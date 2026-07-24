@@ -1,0 +1,117 @@
+================================================================================
+TIME SERIES TREND ANALYSIS & BUSINESS IMPLICATIONS
+================================================================================
+
+1. RESAMPLING SUMMARY (Task 1)
+--------------------------------------------------------------------------------
+- Weekly Revenue:
+date
+2026-01-04    41369.49
+2026-01-11    71939.28
+2026-01-18    62747.49
+2026-01-25    66683.16
+2026-02-01    71421.55
+2026-02-08    65782.49
+2026-02-15    71067.11
+2026-02-22    71712.97
+2026-03-01    78877.25
+2026-03-08    74197.32
+2026-03-15    82450.19
+2026-03-22    70764.32
+2026-03-29    79552.70
+2026-04-05    77842.37
+2026-04-12    74668.00
+2026-04-19    81974.39
+2026-04-26    81494.14
+2026-05-03    84262.95
+2026-05-10    81145.96
+2026-05-17    79412.90
+2026-05-24    82531.27
+2026-05-31    83527.82
+2026-06-07    87647.25
+2026-06-14    86514.66
+2026-06-21    87011.53
+2026-06-28    90949.95
+2026-07-05    31038.75
+Freq: W-SUN
+
+- Weekly Orders:
+date
+2026-01-04    4
+2026-01-11    7
+2026-01-18    7
+2026-01-25    7
+2026-02-01    7
+2026-02-08    7
+2026-02-15    7
+2026-02-22    7
+2026-03-01    7
+2026-03-08    7
+2026-03-15    7
+2026-03-22    7
+2026-03-29    7
+2026-04-05    7
+2026-04-12    7
+2026-04-19    7
+2026-04-26    7
+2026-05-03    7
+2026-05-10    7
+2026-05-17    7
+2026-05-24    7
+2026-05-31    7
+2026-06-07    7
+2026-06-14    7
+2026-06-21    7
+2026-06-28    7
+2026-07-05    2
+Freq: W-SUN
+
+- Comparison:
+  * Highest Revenue Week: 2026-06-28 with $90,949.95
+  * Highest Revenue Month: June 2026 with $383,162.14
+
+2. ROLLING AVERAGE OBSERVATIONS (Task 2)
+--------------------------------------------------------------------------------
+- 7-day MA reveals weekly cyclical patterns (e.g., weekend dips) and filters out daily spikes.
+- 30-day MA reveals the long-term trend, smoothing out the high daily noise and weekly cycles.
+- Hidden trend: Daily revenue fluctuates wildly (e.g., standard deviation of $2,225.37), masking whether the business is growing. The 30-day MA clearly shows a steady, continuous trend that is invisible when looking at daily data alone.
+
+3. MONTH-OVER-MONTH (MoM) GROWTH ANALYSIS (Task 3)
+--------------------------------------------------------------------------------
+- January 2026: Baseline month (N/A)
+- February 2026: -4.82% (Decline)
+- March 2026: +18.00% (Growth)
+- April 2026: +1.02% (Growth)
+- May 2026: +4.66% (Growth)
+- June 2026: +6.48% (Growth)
+
+- Growth Months:
+March 2026, April 2026, May 2026, June 2026
+- Decline Months:
+February 2026
+
+- Pattern Interpretation:
+  The growth pattern indicates a stable and accelerating trajectory. Monthly revenues are expanding consistently MoM, confirming that the short-term fluctuations are noise rather than structural issues.
+
+4. CUMULATIVE REVENUE METRICS (Task 4)
+--------------------------------------------------------------------------------
+- Total Revenue Accumulated by End of Period: $2,018,587.26
+- Visualized in: output/cumulative.png
+
+5. TREND ANALYSIS & BUSINESS IMPLICATIONS (Task 5)
+--------------------------------------------------------------------------------
+- Rolling Average Trend: UP
+- Change in 30-day MA over last 30 days of period: +9.17%
+- Month-over-Month Growth (Latest Month): +6.48%
+- Revenue Volatility (Daily standard deviation): $2,225.37 (measure of noise)
+
+- Business Implication:
+  Accelerating growth - maintain current strategy. The business is experiencing sustainable, positive momentum once daily noise is filtered out.
+
+- Suggested Actions:
+1. Maintain the current marketing and sales strategy.
+2. Prepare operational capacity for increased order volume.
+3. Consider investing surplus cash into growth channels to capitalize on momentum.
+
+================================================================================
+Report generated successfully.
