@@ -80,11 +80,9 @@ elif page == "Data Ingestion & Upload":
     st.title("Data Ingestion & Dataset Preview")
     st.caption("Upload CSV or JSON files for instant automated preview, validation, and statistical analysis.")
 
-    # Task 1: File Uploader Component
     uploaded_file = st.file_uploader("Upload your dataset", type=["csv", "json"])
 
     if uploaded_file is not None:
-        # Task 4: Error Handling for Invalid/Empty Files
         try:
             if uploaded_file.name.endswith(".csv"):
                 df = pd.read_csv(uploaded_file)
@@ -105,7 +103,6 @@ elif page == "Data Ingestion & Upload":
 
         st.divider()
 
-        # Task 2: Display Automatic Preview
         st.header("Dataset Preview")
 
         col1, col2, col3 = st.columns(3)
@@ -133,7 +130,6 @@ elif page == "Data Ingestion & Upload":
 
         st.divider()
 
-        # Task 3: Display Basic Statistics
         st.subheader("Descriptive Statistics")
         numeric_df = df.select_dtypes(include="number")
         if not numeric_df.empty:
@@ -143,7 +139,6 @@ elif page == "Data Ingestion & Upload":
 
         st.divider()
 
-        # Task 5: Downstream Interactive Exploration
         st.subheader("Quick Exploration")
         numeric_cols = df.select_dtypes(include="number").columns.tolist()
         if numeric_cols:
