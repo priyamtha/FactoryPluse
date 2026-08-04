@@ -1,0 +1,4 @@
+customer_type,avg_ltv,churn_rate,avg_tickets,avg_retention,count,recommended_action
+Enterprise,149884.3351851852,0.0,1.2777777777777777,1199.7592592592594,54,Maintain high-touch premium support and executive alignment to retain these high-value accounts.
+SMB,8047.4814250614245,0.10565110565110565,4.412776412776413,238.21867321867322,407,Address onboarding friction and introduce lower-cost self-serve tiers to combat the elevated 12% churn.
+Startup,1997.134025974026,0.07792207792207792,3.0074211502782933,477.4378478664193,539,Provide scaleable self-service documentation and education paths to optimize low LTV accounts.
