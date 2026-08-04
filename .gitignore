@@ -7,3 +7,7 @@ __pycache__/
 
 # Ignore Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Ignore local databases
+*.db
+analytics.db
