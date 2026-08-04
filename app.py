@@ -6,7 +6,7 @@ import numpy as np
 # 1. Page Configuration
 # -------------------------------------------------------------
 st.set_page_config(
-    page_title="Analytics Dashboard",
+    page_title="Interactive Data Ingestion & Analytics Shell",
     page_icon="📊",
     layout="wide"
 )
@@ -19,22 +19,20 @@ st.sidebar.markdown("Use the controls below to switch between dashboard sections
 
 page = st.sidebar.radio(
     "Go to",
-    ["Overview", "Trends", "Data Explorer"]
+    ["Overview", "Data Ingestion & Upload", "Trends", "Data Explorer"]
 )
 
 st.sidebar.divider()
 st.sidebar.caption("System Status: **Live Data Layer Connected**")
-st.sidebar.caption("Environment: **Production v1.4.0**")
+st.sidebar.caption("Environment: **Production v1.5.0**")
 
 # -------------------------------------------------------------
-# 3. Section 1: Overview (Above-the-Fold KPI First Impression)
+# 3. Section 1: Overview
 # -------------------------------------------------------------
 if page == "Overview":
-    # Single page title at very top
     st.title("Business Overview")
     st.caption("Executive Health Indicators | Real-Time Performance Snapshot")
 
-    # Task 5: Important Content Above the Fold (5 Top-Row KPI Cards)
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.metric("Revenue", "$5.2M", "+12.5%")
@@ -49,7 +47,6 @@ if page == "Overview":
 
     st.divider()
 
-    # Section headers and subheaders for visual hierarchy
     st.header("Executive Summary")
     st.subheader("Key Organizational Highlights & Operational Signals")
     
@@ -67,18 +64,95 @@ if page == "Overview":
 
     st.divider()
 
-    # Expander for methodology notes
     with st.expander("About These Metrics & Calculation Methodology"):
         st.write("""
-        **Revenue:** Calculated as the sum of all settled order amounts for the current rolling 30-day window.  
-        **Active Users:** Count of unique customer accounts with at least one active session in the last 30 days.  
+        **Revenue:** Sum of all settled order amounts for the current rolling 30-day window.  
+        **Active Users:** Unique customer accounts with at least one session in the last 30 days.  
         **Average Order Value (AOV):** Total revenue divided by total completed orders.  
-        **Churn Rate:** Percentage of active customers from Month N-1 who did not place an order in Month N.  
-        **Net Promoter Score (NPS):** Calculated from post-support survey responses (Promoters % minus Detractors %).
+        **Churn Rate:** Percentage of active customers from Month N-1 who placed no order in Month N.  
+        **Net Promoter Score (NPS):** Post-support survey score (Promoters % minus Detractors %).
         """)
 
 # -------------------------------------------------------------
-# 4. Section 2: Trends (Time-Series & Comparative Layout)
+# 4. Section 2: Data Ingestion & File Upload (Tasks 1 - 5)
+# -------------------------------------------------------------
+elif page == "Data Ingestion & Upload":
+    st.title("Data Ingestion & Dataset Preview")
+    st.caption("Upload CSV or JSON files for instant automated preview, validation, and statistical analysis.")
+
+    uploaded_file = st.file_uploader("Upload your dataset", type=["csv", "json"])
+
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.endswith(".csv"):
+                df = pd.read_csv(uploaded_file)
+            elif uploaded_file.name.endswith(".json"):
+                df = pd.read_json(uploaded_file)
+            else:
+                st.error("Unsupported file type. Please upload a CSV or JSON file.")
+                st.stop()
+
+            if len(df) == 0:
+                st.warning("Uploaded file is empty. Please upload a file containing data rows.")
+                st.stop()
+        except Exception:
+            st.error("Could not read this file. Check the format and try again.")
+            st.stop()
+
+        st.success(f"Loaded: {uploaded_file.name} ({len(df):,} rows, {len(df.columns)} columns)")
+
+        st.divider()
+
+        st.header("Dataset Preview")
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Rows", f"{len(df):,}")
+        with col2:
+            st.metric("Columns", str(len(df.columns)))
+        with col3:
+            total_cells = df.shape[0] * df.shape[1]
+            null_pct = (df.isnull().sum().sum() / total_cells * 100) if total_cells > 0 else 0.0
+            st.metric("Null %", f"{null_pct:.1f}%")
+
+        st.subheader("First 10 Rows")
+        st.dataframe(df.head(10), use_container_width=True)
+
+        st.subheader("Column Summary")
+        summary = pd.DataFrame({
+            "Column": df.columns,
+            "Type": df.dtypes.astype(str).values,
+            "Non-Null": df.notnull().sum().values,
+            "Null Count": df.isnull().sum().values,
+            "Null %": (df.isnull().sum() / len(df) * 100).round(1).values
+        })
+        st.dataframe(summary, use_container_width=True)
+
+        st.divider()
+
+        st.subheader("Descriptive Statistics")
+        numeric_df = df.select_dtypes(include="number")
+        if not numeric_df.empty:
+            st.dataframe(df.describe(), use_container_width=True)
+        else:
+            st.info("No numeric columns available for descriptive statistics.")
+
+        st.divider()
+
+        st.subheader("Quick Exploration")
+        numeric_cols = df.select_dtypes(include="number").columns.tolist()
+        if numeric_cols:
+            selected_col = st.selectbox("Select a column to visualise", numeric_cols)
+            st.markdown(f"**Value Frequency Distribution for `{selected_col}` (Top 20 Categories/Buckets):**")
+            st.bar_chart(df[selected_col].value_counts().head(20))
+        else:
+            st.info("Upload a dataset containing numeric columns to enable interactive charting.")
+
+    else:
+        st.info("Upload a CSV or JSON file to begin analysis.")
+
+# -------------------------------------------------------------
+# 5. Section 3: Trends
 # -------------------------------------------------------------
 elif page == "Trends":
     st.title("Trend Analysis")
@@ -106,28 +180,6 @@ elif page == "Trends":
 
     st.divider()
 
-    st.header("Customer Metrics")
-    st.subheader("Active Customers & Retention Trends Over Time")
-    
-    col_c1, col_c2 = st.columns(2)
-    with col_c1:
-        st.markdown("**Active Customer Count**")
-        chart_data_cust = pd.DataFrame({
-            'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            'Active Users': [2100, 2150, 2200, 2250, 2300, 2350, 2400, 2420, 2450, 2480, 2510, 2500]
-        }).set_index('Month')
-        st.line_chart(chart_data_cust)
-        
-    with col_c2:
-        st.markdown("**Monthly Churn Rate Trend (%)**")
-        chart_data_churn = pd.DataFrame({
-            'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            'Churn Rate (%)': [8.0, 7.8, 7.5, 7.2, 6.8, 6.5, 6.2, 5.9, 5.7, 5.5, 5.4, 5.2]
-        }).set_index('Month')
-        st.line_chart(chart_data_churn)
-
-    st.divider()
-
     with st.expander("Historical Benchmark Notes & Seasonal Baseline Details"):
         st.write("""
         - Seasonal peak revenue occurs typically in Q4 during enterprise contract renewal windows.
@@ -135,7 +187,7 @@ elif page == "Trends":
         """)
 
 # -------------------------------------------------------------
-# 5. Section 3: Data Explorer (Raw Dataset & Filtering Controls)
+# 6. Section 4: Data Explorer
 # -------------------------------------------------------------
 elif page == "Data Explorer":
     st.title("Data Explorer")
@@ -150,7 +202,6 @@ elif page == "Data Explorer":
     with col_f2:
         min_rev = st.slider("Minimum Revenue ($)", 0, 10000, 500)
 
-    # Generate sample dataset
     np.random.seed(42)
     n = 100
     df_raw = pd.DataFrame({
@@ -161,7 +212,6 @@ elif page == "Data Explorer":
         'status': np.random.choice(['Active', 'At-Risk', 'Churned'], p=[0.75, 0.15, 0.10], size=n)
     })
 
-    # Apply filters
     filtered_df = df_raw[df_raw['revenue'] >= min_rev].copy()
     if search_query:
         filtered_df = filtered_df[
@@ -172,22 +222,9 @@ elif page == "Data Explorer":
     st.markdown(f"Displaying **{len(filtered_df)}** matching customer records:")
     st.dataframe(filtered_df, use_container_width=True)
 
-    col_d1, col_d2 = st.columns(2)
-    with col_d1:
-        st.download_button(
-            label="📥 Download Filtered Data (CSV)",
-            data=filtered_df.to_csv(index=False).encode('utf-8'),
-            file_name="filtered_customer_data.csv",
-            mime="text/csv"
-        )
-
-    st.divider()
-
-    with st.expander("Data Dictionary & Column Definitions"):
-        st.write("""
-        - **customer_id:** Unique identifier for the account.
-        - **segment:** Business market tier (`Enterprise`, `Mid-Market`, `SMB`, `Starter`).
-        - **revenue:** Total annual contract value (ACV) in USD.
-        - **support_response_hrs:** Average first response duration for support tickets.
-        - **status:** Current account health state (`Active`, `At-Risk`, `Churned`).
-        """)
+    st.download_button(
+        label="📥 Download Filtered Data (CSV)",
+        data=filtered_df.to_csv(index=False).encode('utf-8'),
+        file_name="filtered_customer_data.csv",
+        mime="text/csv"
+    )
