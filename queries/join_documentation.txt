@@ -1,0 +1,42 @@
+JOIN STRATEGY DOCUMENTATION
+
+Table: customers (1000 rows, PK: customer_id)
+Table: orders (5000 rows, FK: customer_id)
+Table: order_items (8000 rows, FK: order_id)
+Table: products (500 rows, PK: product_id)
+
+--------------------------------------------------------------------------------
+Decision 1: customers LEFT JOIN orders
+--------------------------------------------------------------------------------
+- Purpose: Get all customers with their order history.
+- Row count change: 1000 -> 5000 (one row per order, plus NULL rows for customers with no orders).
+- Multiplication Factor: On average, ~5.0 orders per active customer.
+- Unmatched Keys: 100 customers have no orders (retained with NULL order columns).
+- Orphaned Records: 10 orders have a customer_id that does not exist in the customers table (orphaned orders).
+- Business Use: Customer lifetime value (LTV) calculations, marketing reactivation analysis for silent accounts.
+
+--------------------------------------------------------------------------------
+Decision 2: orders LEFT JOIN order_items  
+--------------------------------------------------------------------------------
+- Purpose: Extract detailed line-item context for each order.
+- Row count change: 5000 -> 8000 (multiple items per order).
+- Unmatched: 0 (all orders have at least one product line item).
+- Business Use: Product revenue breakdown, cross-selling analysis, inventory demand planning.
+
+--------------------------------------------------------------------------------
+Decision 3: Multi-table Join (customers JOIN orders JOIN order_items JOIN products)
+--------------------------------------------------------------------------------
+- Purpose: Complete order details with product descriptions.
+- Row count change: 5000 -> 8000 (base orders multiplied by line items).
+- Risk: High risk of double-counting aggregate revenue if summing fields post-join directly without grouping correctly.
+- Solution: Perform validation checking to verify that SUM(quantity * unit_price) from the final joined set matches the sum of the order_items table exactly.
+
+--------------------------------------------------------------------------------
+Decision 4: FULL OUTER JOIN
+--------------------------------------------------------------------------------
+- Purpose: Audit alignment and detect missing relations on both sides.
+- SQLite Compatibility Note: Emulated in SQLite using a LEFT JOIN UNIONed with a RIGHT JOIN (emulated via LEFT JOIN from orders to customers with a NULL check).
+- Output: Returns 1,000 customers (including the 100 unmatched ones) PLUS the 10 orphaned orders, resulting in 5,010 unique primary keys (or 5,010 combined output rows before multi-item expansion).
+- Business Use: Data reconciliation, system synchronization health checks, locating orphaned transactions.
+
+Validation: Row counts match expected, no orphaned records missed, no duplicate multiplications detected.
