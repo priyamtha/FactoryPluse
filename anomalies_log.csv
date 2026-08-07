@@ -1,0 +1,2 @@
+timestamp,anomaly_date,metric,value,expected_range,z_score,severity,status
+2026-08-04 09:41:05,2026-07-26,daily_revenue,2000.01,6610-12819,4.97,CRITICAL,OPEN

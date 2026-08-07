@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metric Selector</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background-color: #fafafa; }
+        .chart-card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 20px; max-width: 1000px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="chart-card">
+        <div id="chart3" style="width:100%;height:550px;"></div>
+    </div>
+    <script>
+        const data = [{"x":["Enterprise SaaS","Industrial Hardware","Cloud Analytics","Consumer Gadgets","Starter Services"],"y":[2400000,1800000,1400000,900000,500000],"name":"Revenue","type":"bar","marker":{"color":"#1f77b4"},"hovertemplate":"<b>%{x}</b><br>Revenue: $%{y:,.2f}<extra></extra>","visible":true},{"x":["Enterprise SaaS","Industrial Hardware","Cloud Analytics","Consumer Gadgets","Starter Services"],"y":[960000,540000,420000,180000,75000],"name":"Profit","type":"bar","marker":{"color":"#ff7f0e"},"hovertemplate":"<b>%{x}</b><br>Profit: $%{y:,.2f}<extra></extra>","visible":false},{"x":["Enterprise SaaS","Industrial Hardware","Cloud Analytics","Consumer Gadgets","Starter Services"],"y":[1200,1500,2200,3000,2500],"name":"Order Count","type":"bar","marker":{"color":"#2ca02c"},"hovertemplate":"<b>%{x}</b><br>Order Count: %{y:,} orders<extra></extra>","visible":false}];
+        const layout = {"title":{"text":"Product Performance (Metric Selector Dropdown)","font":{"size":18}},"xaxis":{"title":"Product Line"},"yaxis":{"title":"Revenue ($)","tickprefix":"$"},"template":"plotly_white","updatemenus":[{"active":0,"x":0,"xanchor":"left","y":1.15,"yanchor":"top","buttons":[{"label":"Revenue ($)","method":"update","args":[{"visible":[true,false,false]},{"title":"Product Performance: Revenue ($)","yaxis":{"title":"Revenue ($)","tickprefix":"$"}}]},{"label":"Profit ($)","method":"update","args":[{"visible":[false,true,false]},{"title":"Product Performance: Net Profit ($)","yaxis":{"title":"Profit ($)","tickprefix":"$"}}]},{"label":"Order Count","method":"update","args":[{"visible":[false,false,true]},{"title":"Product Performance: Total Order Count","yaxis":{"title":"Order Count","tickprefix":""}}]}]}]};
+        const config = {"responsive":true,"displayModeBar":true};
+        Plotly.newPlot('chart3', data, layout, config);
+    </script>
+</body>
+</html>

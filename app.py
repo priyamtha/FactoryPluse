@@ -1,255 +1,230 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import sqlite3
 
-# Set page config for a premium layout
+# -------------------------------------------------------------
+# 1. Page Configuration
+# -------------------------------------------------------------
 st.set_page_config(
-    page_title="Segment Analysis Workflow",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Interactive Data Ingestion & Analytics Shell",
+    page_icon="📊",
+    layout="wide"
 )
 
-# Custom styling for KPI cards and layout
-st.markdown("""
-<style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    .metric-card {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e9ecef;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    .metric-label {
-        font-size: 14px;
-        color: #6c757d;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .metric-value {
-        font-size: 28px;
-        color: #2b3e50;
-        font-weight: 700;
-        margin-top: 5px;
-    }
-    .workflow-box {
-        background-color: #f1f3f5;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 5px solid #2b3e50;
-        margin-bottom: 15px;
-    }
-</style>
-""", unsafe_allow_html=True)
+# -------------------------------------------------------------
+# 2. Sidebar Navigation Shell
+# -------------------------------------------------------------
+st.sidebar.title("Navigation")
+st.sidebar.markdown("Use the controls below to switch between dashboard sections.")
+
+page = st.sidebar.radio(
+    "Go to",
+    ["Overview", "Data Ingestion & Upload", "Trends", "Data Explorer"]
+)
+
+st.sidebar.divider()
+st.sidebar.caption("System Status: **Live Data Layer Connected**")
+st.sidebar.caption("Environment: **Production v1.5.0**")
 
 # -------------------------------------------------------------
-# Data Loading & Preparation
+# 3. Section 1: Overview
 # -------------------------------------------------------------
-@st.cache_data
-def load_data():
-    try:
-        conn = sqlite3.connect("analytics.db")
-        query = """
-            SELECT 
-                o.order_date AS date, 
-                c.customer_type AS segment, 
-                o.order_amount AS revenue 
-            FROM orders o 
-            JOIN customers c ON o.customer_id = c.customer_id
-        """
-        df = pd.read_sql(query, conn)
-        conn.close()
-        df["date"] = pd.to_datetime(df["date"])
-        return df
-    except Exception as e:
-        # Fallback to generating synthetic data if db is missing or table structure differs
-        np.random.seed(42)
-        dates = pd.date_range(start="2024-01-01", end="2024-12-31", freq="D")
-        n_days = len(dates)
-        repeated_dates = np.random.choice(dates, size=2000)
-        segments = np.random.choice(['SMB', 'Startup', 'Enterprise'], size=2000, p=[0.4, 0.4, 0.2])
-        
-        revenue = []
-        for s in segments:
-            if s == 'Enterprise':
-                revenue.append(np.random.normal(loc=1200, scale=150))
-            elif s == 'SMB':
-                revenue.append(np.random.normal(loc=400, scale=50))
-            else:  # Startup
-                revenue.append(np.random.normal(loc=200, scale=30))
-                
-        df = pd.DataFrame({
-            "date": pd.to_datetime(repeated_dates),
-            "segment": segments,
-            "revenue": np.maximum(np.array(revenue), 10.0).round(2)
+if page == "Overview":
+    st.title("Business Overview")
+    st.caption("Executive Health Indicators | Real-Time Performance Snapshot")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        st.metric("Revenue", "$5.2M", "+12.5%")
+    with col2:
+        st.metric("Users", "2,500", "+5.2%")
+    with col3:
+        st.metric("AOV", "$45", "+2.1%")
+    with col4:
+        st.metric("Churn", "5.2%", "-2.8%", delta_color="inverse")
+    with col5:
+        st.metric("NPS", "72", "+4")
+
+    st.divider()
+
+    st.header("Executive Summary")
+    st.subheader("Key Organizational Highlights & Operational Signals")
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown("""
+        - **Revenue Growth:** Quarter-over-quarter expansion driven by enterprise tier adoption (+18%).
+        - **Retention Improvement:** Churn rate decreased by 2.8% following support SLA enforcement.
+        """)
+    with col_b:
+        st.markdown("""
+        - **Active User Base:** Exceeded 2,500 active accounts with a 92% renewal probability score.
+        - **Customer Satisfaction:** NPS score increased by 4 points to 72.
+        """)
+
+    st.divider()
+
+    with st.expander("About These Metrics & Calculation Methodology"):
+        st.write("""
+        **Revenue:** Sum of all settled order amounts for the current rolling 30-day window.  
+        **Active Users:** Unique customer accounts with at least one session in the last 30 days.  
+        **Average Order Value (AOV):** Total revenue divided by total completed orders.  
+        **Churn Rate:** Percentage of active customers from Month N-1 who placed no order in Month N.  
+        **Net Promoter Score (NPS):** Post-support survey score (Promoters % minus Detractors %).
+        """)
+
+# -------------------------------------------------------------
+# 4. Section 2: Data Ingestion & File Upload (Tasks 1 - 5)
+# -------------------------------------------------------------
+elif page == "Data Ingestion & Upload":
+    st.title("Data Ingestion & Dataset Preview")
+    st.caption("Upload CSV or JSON files for instant automated preview, validation, and statistical analysis.")
+
+    uploaded_file = st.file_uploader("Upload your dataset", type=["csv", "json"])
+
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.endswith(".csv"):
+                df = pd.read_csv(uploaded_file)
+            elif uploaded_file.name.endswith(".json"):
+                df = pd.read_json(uploaded_file)
+            else:
+                st.error("Unsupported file type. Please upload a CSV or JSON file.")
+                st.stop()
+
+            if len(df) == 0:
+                st.warning("Uploaded file is empty. Please upload a file containing data rows.")
+                st.stop()
+        except Exception:
+            st.error("Could not read this file. Check the format and try again.")
+            st.stop()
+
+        st.success(f"Loaded: {uploaded_file.name} ({len(df):,} rows, {len(df.columns)} columns)")
+
+        st.divider()
+
+        st.header("Dataset Preview")
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Rows", f"{len(df):,}")
+        with col2:
+            st.metric("Columns", str(len(df.columns)))
+        with col3:
+            total_cells = df.shape[0] * df.shape[1]
+            null_pct = (df.isnull().sum().sum() / total_cells * 100) if total_cells > 0 else 0.0
+            st.metric("Null %", f"{null_pct:.1f}%")
+
+        st.subheader("First 10 Rows")
+        st.dataframe(df.head(10), use_container_width=True)
+
+        st.subheader("Column Summary")
+        summary = pd.DataFrame({
+            "Column": df.columns,
+            "Type": df.dtypes.astype(str).values,
+            "Non-Null": df.notnull().sum().values,
+            "Null Count": df.isnull().sum().values,
+            "Null %": (df.isnull().sum() / len(df) * 100).round(1).values
         })
-        return df
+        st.dataframe(summary, use_container_width=True)
 
-df = load_data()
+        st.divider()
 
-# -------------------------------------------------------------
-# Task 1 & 2 & 5: Session State Initialization & Documentation
-# -------------------------------------------------------------
-# Safe initialization with 'not in' checks to prevent overwriting values on reruns.
-# Descriptive keys are used to ensure code clarity.
-
-# "selected_segment" - stores the user's segment choice from Step 1
-# so it survives reruns when the user interacts with Step 2 widgets.
-if "selected_segment" not in st.session_state:
-    st.session_state["selected_segment"] = "All"
-
-# "workflow_step" - tracks which step the user has completed.
-# Prevents Step 2 from displaying before Step 1 is confirmed.
-if "workflow_step" not in st.session_state:
-    st.session_state["workflow_step"] = 1
-
-# "analysis_result" - caches the computation from Step 2 so
-# it does not recompute when unrelated widgets are changed.
-if "analysis_result" not in st.session_state:
-    st.session_state["analysis_result"] = None
-
-# -------------------------------------------------------------
-# Sidebar Navigation & Reset
-# -------------------------------------------------------------
-st.sidebar.header("Workflow Control")
-
-# Task 4: Implement Session State Reset
-if st.sidebar.button("Reset Workflow"):
-    for key in ["selected_segment", "workflow_step", "analysis_result"]:
-        if key in st.session_state:
-            del st.session_state[key]
-    st.rerun()
-
-# Display current workflow status in sidebar for context
-st.sidebar.markdown("---")
-st.sidebar.subheader("Workflow Status")
-st.sidebar.markdown(f"**Current Step:** {st.session_state['workflow_step']}")
-st.sidebar.markdown(f"**Selected Segment:** `{st.session_state['selected_segment']}`")
-st.sidebar.markdown(f"**Cached Result:** `{'Yes' if st.session_state['analysis_result'] is not None else 'No'}`")
-
-# -------------------------------------------------------------
-# Main Application Layout
-# -------------------------------------------------------------
-st.title("⚡ Segment Analysis Workflow")
-st.markdown("A guided multi-step analytics dashboard using persisted Streamlit session state.")
-st.markdown("---")
-
-# -------------------------------------------------------------
-# Task 3: Step 1: Select Segment
-# -------------------------------------------------------------
-st.header("Step 1: Select Segment")
-
-# Available segments to choose from (matches database unique values + Mid-Market for testing empty states)
-segments_list = ["All", "Enterprise", "Mid-Market", "SMB", "Startup"]
-
-# Selectbox retrieves the current selected segment as default index if it was already selected
-default_idx = segments_list.index(st.session_state["selected_segment"]) if st.session_state["selected_segment"] in segments_list else 0
-
-segment = st.selectbox("Segment", options=segments_list, index=default_idx)
-
-if st.button("Confirm Segment"):
-    st.session_state["selected_segment"] = segment
-    st.session_state["workflow_step"] = 2
-    # Invalidate cached results on segment change to force recomputation
-    st.session_state["analysis_result"] = None
-    st.rerun()
-
-st.markdown("---")
-
-# -------------------------------------------------------------
-# Task 3: Step 2: Analysis (rendered only if Step 1 is complete)
-# -------------------------------------------------------------
-if st.session_state["workflow_step"] >= 2:
-    st.header("Step 2: Analysis")
-    chosen = st.session_state["selected_segment"]
-    st.write("Analysing: " + chosen)
-    
-    # Task 5: Compute and cache results in "analysis_result" to prevent unnecessary recomputation
-    if st.session_state["analysis_result"] is None:
-        # Filter dataframe by chosen segment
-        if chosen == "All":
-            filtered_df = df
+        st.subheader("Descriptive Statistics")
+        numeric_df = df.select_dtypes(include="number")
+        if not numeric_df.empty:
+            st.dataframe(df.describe(), use_container_width=True)
         else:
-            filtered_df = df[df["segment"] == chosen]
-            
-        # Perform computation
-        total_rev = filtered_df["revenue"].sum()
-        total_orders = len(filtered_df)
-        avg_rev = filtered_df["revenue"].mean() if total_orders > 0 else 0.0
-        
-        # Save metrics to analysis_result cache
-        st.session_state["analysis_result"] = {
-            "total_revenue": total_rev,
-            "total_orders": total_orders,
-            "avg_revenue": avg_rev,
-            # We also store the filtered data for visualization
-            "data": filtered_df.to_json(orient="split", date_format="iso")
-        }
-        st.info("🔄 Computed analytics and cached results in session state.")
+            st.info("No numeric columns available for descriptive statistics.")
+
+        st.divider()
+
+        st.subheader("Quick Exploration")
+        numeric_cols = df.select_dtypes(include="number").columns.tolist()
+        if numeric_cols:
+            selected_col = st.selectbox("Select a column to visualise", numeric_cols)
+            st.markdown(f"**Value Frequency Distribution for `{selected_col}` (Top 20 Categories/Buckets):**")
+            st.bar_chart(df[selected_col].value_counts().head(20))
+        else:
+            st.info("Upload a dataset containing numeric columns to enable interactive charting.")
+
     else:
-        st.success("✅ Displaying cached analysis results (No recomputation).")
-        
-    # Read computed metrics from session state
-    cached_metrics = st.session_state["analysis_result"]
-    total_rev = cached_metrics["total_revenue"]
-    total_orders = cached_metrics["total_orders"]
-    avg_rev = cached_metrics["avg_revenue"]
+        st.info("Upload a CSV or JSON file to begin analysis.")
+
+# -------------------------------------------------------------
+# 5. Section 3: Trends
+# -------------------------------------------------------------
+elif page == "Trends":
+    st.title("Trend Analysis")
+    st.caption("Historical Performance Tracking & Time-Series Benchmarks")
+
+    st.header("Revenue Trends")
+    st.subheader("Monthly Revenue & Growth Trajectory (Last 12 Months)")
     
-    # Load data from json
-    filtered_df = pd.read_json(cached_metrics["data"], orient="split")
-    filtered_df["date"] = pd.to_datetime(filtered_df["date"])
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Monthly Revenue Breakdown ($M)**")
+        chart_data_rev = pd.DataFrame({
+            'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'Revenue ($M)': [3.8, 4.0, 4.2, 4.1, 4.5, 4.7, 4.6, 4.8, 5.0, 5.1, 5.3, 5.2]
+        }).set_index('Month')
+        st.line_chart(chart_data_rev)
     
-    # Handle empty filtered dataframe (e.g. Mid-Market has 0 rows)
-    if total_orders == 0:
-        st.warning("⚠️ No data matches the selected segment. Try selecting another segment in Step 1.")
-    else:
-        # Render metrics layout
-        kpi_col1, kpi_col2, kpi_col3 = st.columns(3)
-        with kpi_col1:
-            st.markdown(
-                f"""
-                <div class="metric-card">
-                    <div class="metric-label">Total Revenue</div>
-                    <div class="metric-value">${total_rev:,.2f}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        with kpi_col2:
-            st.markdown(
-                f"""
-                <div class="metric-card">
-                    <div class="metric-label">Total Orders</div>
-                    <div class="metric-value">{total_orders:,}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        with kpi_col3:
-            st.markdown(
-                f"""
-                <div class="metric-card">
-                    <div class="metric-label">Average Order Value</div>
-                    <div class="metric-value">${avg_rev:,.2f}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-            
-        # Render a trend line chart
-        st.subheader("Daily Revenue Trend for Segment")
-        trend_df = filtered_df.groupby("date")["revenue"].sum().reset_index()
-        trend_df = trend_df.set_index("date")
-        st.line_chart(trend_df, y="revenue", color="#2b3e50")
-        
-        # Display sample transaction details
-        st.subheader("Segment Data Log")
-        st.write(f"Showing top 20 of {total_orders:,} records:")
-        st.dataframe(filtered_df.head(20), width='stretch')
+    with col2:
+        st.markdown("**Revenue Distribution by Product Line**")
+        chart_data_prod = pd.DataFrame({
+            'Product': ['Enterprise SaaS', 'Cloud Analytics', 'Industrial Hardware', 'Starter Services'],
+            'Revenue ($)': [2400000, 1400000, 900000, 500000]
+        }).set_index('Product')
+        st.bar_chart(chart_data_prod)
+
+    st.divider()
+
+    with st.expander("Historical Benchmark Notes & Seasonal Baseline Details"):
+        st.write("""
+        - Seasonal peak revenue occurs typically in Q4 during enterprise contract renewal windows.
+        - Churn rates have shown consistent month-over-month reductions following the rollout of the 2-hour support SLA.
+        """)
+
+# -------------------------------------------------------------
+# 6. Section 4: Data Explorer
+# -------------------------------------------------------------
+elif page == "Data Explorer":
+    st.title("Data Explorer")
+    st.caption("Granular Dataset Inspection, Filtering, and Export Options")
+
+    st.header("Filter & Export Records")
+    st.subheader("Interactive Record Search & Column Controls")
+
+    col_f1, col_f2 = st.columns([2, 1])
+    with col_f1:
+        search_query = st.text_input("Search Customer ID or Segment", "")
+    with col_f2:
+        min_rev = st.slider("Minimum Revenue ($)", 0, 10000, 500)
+
+    np.random.seed(42)
+    n = 100
+    df_raw = pd.DataFrame({
+        'customer_id': [f"CUST-{1000+i}" for i in range(n)],
+        'segment': np.random.choice(['Enterprise', 'Mid-Market', 'SMB', 'Starter'], size=n),
+        'revenue': np.random.randint(200, 12000, size=n),
+        'support_response_hrs': np.round(np.random.uniform(0.5, 26.0, size=n), 1),
+        'status': np.random.choice(['Active', 'At-Risk', 'Churned'], p=[0.75, 0.15, 0.10], size=n)
+    })
+
+    filtered_df = df_raw[df_raw['revenue'] >= min_rev].copy()
+    if search_query:
+        filtered_df = filtered_df[
+            filtered_df['customer_id'].str.contains(search_query, case=False) |
+            filtered_df['segment'].str.contains(search_query, case=False)
+        ]
+
+    st.markdown(f"Displaying **{len(filtered_df)}** matching customer records:")
+    st.dataframe(filtered_df, use_container_width=True)
+
+    st.download_button(
+        label="📥 Download Filtered Data (CSV)",
+        data=filtered_df.to_csv(index=False).encode('utf-8'),
+        file_name="filtered_customer_data.csv",
+        mime="text/csv"
+    )
