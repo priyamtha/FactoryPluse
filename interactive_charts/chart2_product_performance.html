@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Performance</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background-color: #fafafa; }
+        .chart-card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 20px; max-width: 1000px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="chart-card">
+        <div id="chart2" style="width:100%;height:550px;"></div>
+    </div>
+    <script>
+        const data = [{"x":["Enterprise SaaS","Industrial Hardware","Cloud Analytics","Consumer Gadgets","Starter Services"],"y":[2400000,1800000,1400000,900000,500000],"type":"bar","hovertemplate":"<b>%{x}</b><br>Total Revenue: $%{y:,.2f}<br>Total Orders: %{customdata[0]:,} units<br>Avg Order Value: $%{customdata[1]}<br>Unique Customers: %{customdata[2]:,} accounts<extra></extra>","customdata":[["2000.00",450],["1200.00",620],["636.36",890],["300.00",1400],["200.00",1800]],"marker":{"color":"#1f77b4","line":{"color":"#0f3a59","width":1.5}}}];
+        const layout = {"title":{"text":"Product Performance (Multi-Column Tooltip)","font":{"size":18,"color":"#1f77b4"}},"xaxis":{"title":"Product Line"},"yaxis":{"title":"Total Revenue ($)","tickprefix":"$"},"template":"plotly_white"};
+        const config = {"responsive":true,"displayModeBar":true};
+        Plotly.newPlot('chart2', data, layout, config);
+    </script>
+</body>
+</html>

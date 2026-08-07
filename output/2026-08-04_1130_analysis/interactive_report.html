@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Executive Interactive Analysis Report</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f8f9fa; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1 { color: #1f77b4; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Executive Analysis & Churn Reduction Report</h1>
+        <p><strong>Generated:</strong> 4/8/2026, 11:30:11 am</p>
+        <hr>
+        <div>## Churn Analysis Executive Summary<br>- **Key Finding:** Support response time under 2 hours reduces churn to 3%.<br>- **Action Needed:** Hire 2 Support Engineers and enforce <2h SLA.</div>
+    </div>
+    <div class="card">
+        <h2>Interactive Performance Chart</h2>
+        <div id="chart-div" style="height:400px;"></div>
+    </div>
+    <script>
+        Plotly.newPlot('chart-div', [{
+            x: ['<2h', '2-4h', '4-24h', '>24h'],
+            y: [3, 5, 9, 12],
+            type: 'bar',
+            marker: { color: ['#2ca02c', '#1f77b4', '#ff7f0e', '#d62728'] }
+        }], { title: 'Churn Rate by Support Response Time (%)' });
+    </script>
+</body>
+</html>
