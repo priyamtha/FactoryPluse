@@ -13,4 +13,4 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pandas
-      - run: python validate_data.py data/processed/cleaned_data.csv
+      - run: python validate_data.py tests/fixtures/sample_cleaned_data.csv
