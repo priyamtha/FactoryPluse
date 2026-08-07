@@ -1,3 +1,8 @@
+pandas
+numpy
+streamlit
+plotly
+matplotlib
 streamlit==1.38.0
 pandas==2.1.4
 plotly>=5.18.0
